@@ -127,14 +127,9 @@ METHOD send_message.
   DATA(lo_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
   CALL TRANSFORMATION id SOURCE (lt_source) RESULT XML lo_writer.
   DATA(lv_message) = cl_abap_codepage=>convert_from( lo_writer->get_output( ) ).
-  DO.
-    CLEAR lv_key.
-    lv_key = match( val = lv_message regex = '"[0-9_\-]*[A-Z]+[A-Z0-9_\-]*":' ).
-    IF lv_key IS INITIAL.
-      EXIT.
-    ELSE.
-      REPLACE ALL OCCURRENCES OF lv_key IN lv_message WITH to_lower( lv_key ).
-    ENDIF.
+  DATA(lv_regex) = '"[\d_\-]*\u+[\u\d_\-]*":'.
+  DO count( val = lv_message regex = lv_regex ) TIMES.
+    lv_message = replace( val = lv_message regex = lv_regex with = to_lower( match( val = lv_message regex = lv_regex ) ) ).
   ENDDO.
 
   TRY.
