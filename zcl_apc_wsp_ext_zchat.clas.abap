@@ -120,9 +120,6 @@ ENDMETHOD.
 
 METHOD send_message.
 
-  DATA: lo_producer TYPE REF TO if_amc_message_producer_text,
-        lv_key      TYPE        string.
-
   DATA(lt_source) = VALUE abap_trans_srcbind_tab( ( name = im_root_id value = REF #( im_data ) ) ).
   DATA(lo_writer) = cl_sxml_string_writer=>create( type = if_sxml=>co_xt_json ).
   CALL TRANSFORMATION id SOURCE (lt_source) RESULT XML lo_writer.
@@ -133,6 +130,7 @@ METHOD send_message.
   ENDDO.
 
   TRY.
+      DATA lo_producer TYPE REF TO if_amc_message_producer_text.
       lo_producer ?= cl_amc_channel_manager=>create_message_producer(
           i_application_id       = 'ZCHAT'
           i_channel_id           = '/chat'
